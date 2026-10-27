@@ -1,13 +1,16 @@
 # Assignment 3. Maze Escape
 
-Student ID:
-Name:
-Group:
-Maze size (rows x columns):
+Student ID: 254430
+Name: Darkhan
+Group: SE-2540.
+Maze size (rows x columns): 8*9
 
 This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment3.pdf`.
 
 ## Program output
+
+1. java -cp out Main
+2. java tools/Check.java
 
 The 13 lines your program prints on your data (`java -cp out Main`):
 
@@ -32,9 +35,9 @@ used "java tools/MakeVariant.java 254430 data" to generate data in "walls.txt" a
 
 slides:
 ![alt text](src/slides.png)
-![alt text](src/walls.png)
-walls:
 
+walls:
+![alt text](src/walls.png)
 
 ## Questions
 
@@ -48,11 +51,11 @@ Mission 3. Because the maze is a tree structure, there is exactly one unique sim
 
 Mission 4. Reversing edges in the second pass isolates strongly connected components by preventing traversal into other zones. If the number of zones equals the total number of cells, every cell forms its own zone and no cycles exist (DAG).
 
-Mission 5. Processing zones by their assigned IDs follows a valid topological order because Kosaraju assigns IDs in DAG order. This pass takes linear time $O(V + E)$ to evaluate all zones and connections.
+Mission 5. Processing zones by their assigned IDs follows a valid topological order because Kosaraju assigns IDs in DAG order. This pass takes linear time O(V + E) to evaluate all zones and connections.
 
 ## AI use
 
-The syllabus requires you to say which AI tools you used and for what. Write the tool (ChatGPT, Copilot, other) and what you asked it: explain an idea, find an error, review code. Write "none" if you did not use any. If you took code or text from a book or a website, give the source here.
+Artificial intelligence was used to explain theoretical topics, analyze the time complexity for each algorithm, and assist with debugging code implementation issues.
 
 ## Timing (Mission 7)
 
@@ -88,4 +91,3 @@ n is the number of cells, m the number of walls (or slides). Fill in every algor
 - This README is filled in, the program output and the section AI use included.
 - The work is pushed to main (at least one commit per mission) and the repository is public.
 - The link is attached in Moodle.
-# daa2
