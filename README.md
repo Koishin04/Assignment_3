@@ -1,93 +1,96 @@
 # Assignment 3. Maze Escape
 
-Student ID: 254430
-Name: Darkhan
-Group: SE-2540.
-Maze size (rows x columns): 8*9
+Student ID: 254332
 
-This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment3.pdf`.
+Name: Koishin Bakhtiyar
+
+Group: SE-2540
+
+Maze size (rows x columns): 8 x 9
+
+This file is the report. How to start: `START_HERE.md`. The task: `docs/Assignment3.pdf`.
 
 ## Program output
 
-1. java -cp out Main
-2. java tools/Check.java
+The 13 lines printed on my data by `java -cp out Main`:
 
-The 13 lines your program prints on your data (`java -cp out Main`):
-
-    Broken: 3
-    Kept: 1
-    Last broken wall: 3
-    MST cost: 31
-    Heaviest broken wall: 17
-    Path length: 2
-    DFS visited: 3
-    Dead ends: 2
-    Zones: 3
-    Largest zone: 2
+    Broken: 71
+    Kept: 56
+    Last broken wall: 96
+    MST cost: 21998
+    Heaviest broken wall: 738
+    Path length: 21
+    DFS visited: 64
+    Dead ends: 23
+    Zones: 9
+    Largest zone: 15
     Is DAG: 0
-    Flow stages: 3
-    Fastest route cost: 9
+    Flow stages: 6
+    Fastest route cost: 22
 
 My maze:
 
 ![maze](output/maze.png)
-used "java tools/MakeVariant.java 254430 data" to generate data in "walls.txt" and "walls.txt".
-
-slides:
-![alt text](src/slides.png)
-
-walls:
-![alt text](src/walls.png)
 
 ## Questions
 
-Mission 0. find locates the root of an element, while union merges two sets together. They run extremely fast due to path compression and union by size.
+**Mission 0. What do find and union do, and what makes them fast in your code?**
 
-Mission 1. A maze with R * C cells is a spanning tree, which always requires removing R*C-1 walls to connect all cells without cycles. The remaining (R-1)(C-1) internal walls are kept.
+`find` returns the root that represents a cell's group, while `union` merges two different groups and returns `false` if they were already together. Path compression shortens the routes to the roots, and union by size keeps the trees shallow.
 
-Mission 2. Both Kruskal and Prim produce the exact same total MST cost (e.g., 31 for tiny). They are equal because both algorithms find an optimal minimum spanning tree for the same weighted graph.
+**Mission 1. Why is Broken always R*C - 1, and Kept always (R-1)*(C-1)?**
 
-Mission 3. Because the maze is a tree structure, there is exactly one unique simple path between any two cells. To prevent stack overflow on huge grids, DFS is implemented using an iterative stack instead of recursion.
+There are `R*C` cells, and each successful union adds one passage without making a cycle, so connecting them all takes exactly `R*C - 1` broken walls. The grid starts with `R*(C-1) + C*(R-1)` inner walls; subtracting the broken ones leaves `(R-1)*(C-1)` kept walls.
 
-Mission 4. Reversing edges in the second pass isolates strongly connected components by preventing traversal into other zones. If the number of zones equals the total number of cells, every cell forms its own zone and no cycles exist (DAG).
+**Mission 2. My MST cost from Kruskal and from Prim, and why they are equal:**
 
-Mission 5. Processing zones by their assigned IDs follows a valid topological order because Kosaraju assigns IDs in DAG order. This pass takes linear time O(V + E) to evaluate all zones and connections.
+Kruskal gives **21998**, and Prim gives **21998** on my walls. Each algorithm connects all cells using a minimum total cost, so both produce an MST of the same weighted grid; the wall costs are distinct here.
+
+**Mission 3. Why is there exactly one path between two cells? How did you avoid a stack overflow on a huge maze?**
+
+The broken walls make a connected graph without cycles, which is a tree, and a tree has exactly one simple path between any two cells. My DFS stores the cells to explore in an explicit stack instead of calling itself recursively, so a long path does not exhaust the Java call stack.
+
+**Mission 4. Why does the second pass of Kosaraju go on the reversed graph? Why do the slides have no cycle exactly when Zones equals the number of cells?**
+
+The first pass records finishing order; following the reversed slides in the second pass collects a whole strongly connected zone without crossing into a zone that has not yet been assigned. A directed cycle would put at least two cells in the same zone, since these input files have no self-slides; therefore the graph is a DAG exactly when every cell is its own zone.
+
+**Mission 5. Why is it enough to go through the zones in the order of their numbers? What does this pass cost?**
+
+Kosaraju numbers the zones in topological order, so every edge between zones goes from a smaller number to a larger one. By the time I process a zone, all earlier zones have already contributed to its longest chain and cheapest route; the pass costs `O(z + e)`, where `z` is the number of zones and `e` is the number of interzone slides.
 
 ## AI use
 
-Artificial intelligence was used to explain theoretical topics, analyze the time complexity for each algorithm, and assist with debugging code implementation issues.
+I used ChatGPT to review the code, explain DSU, Kosaraju and algorithm complexity, and identify mistakes in the self-union test and the global Flow stages calculation. It also helped draft this README and check the examples, my personal data, the benchmark and a separate zone graph case. If I used any other AI tools, books or websites, I will add them here before submitting.
 
 ## Timing (Mission 7)
 
-Milliseconds, 5 runs each, from `java -cp out Bench`.
+Milliseconds, five runs for each algorithm and maze size from `java -cp out Bench` (the average is rounded):
 
 | maze | Kruskal | Prim |
-|---|---|---|
-| 100 x 100 | avg 12 ms | avg 7 ms |
-| 300 x 300 | avg 41 ms | avg 44 ms |
-| 1000 x 1000 | avg 486 ms | avg 729 ms |
+|---|---:|---:|
+| 100 x 100 | 29, 11, 19, 28, 21 (avg 22 ms) | 34, 8, 9, 7, 7 (avg 13 ms) |
+| 300 x 300 | 162, 102, 70, 50, 63 (avg 89 ms) | 119, 157, 76, 74, 82 (avg 102 ms) |
+| 1000 x 1000 | 1351, 1573, 1419, 1230, 1625 (avg 1439 ms) | 2876, 2157, 2270, 2147, 2467 (avg 2384 ms) |
 
-What do the numbers say about how the time grows? Two or three sentences.
-
-The execution time for both algorithms increases as the grid size grows, due to the larger volume of data. On larger grids, however, Kruskal’s algorithm performs slightly faster than Prim’s (486 ms versus 729 ms), demonstrating effective scalability.
+Both algorithms take more time as the grid grows because they must process more walls. The 1000 x 1000 grid has 100 times as many cells as the 100 x 100 grid, and both measured times grow substantially; individual runs vary because of JVM warmup and system load.
 
 ## Complexity
 
-n is the number of cells, m the number of walls (or slides). Fill in every algorithm you wrote.
+`n` is the number of cells, `m` the number of walls or slides, `z` the number of zones, and `e` the number of interzone slides. Bounds include the data structures built by each algorithm.
 
 | algorithm | time | space | assumptions |
 |---|---|---|---|
-| DSU find and union | O(a(n)) | O(n) | Path compression used |
-| Kruskal | O(m \log m) | O(n + m) | Edges sorted by weight |
-| Prim | O(m \log n) | O(n + m) | Priority queue used |
-| DFS |  O(n + m) |  O(n) | Iterative stack implementation |
-| Kosaraju | O(n + m) | O(n + m) | Two DFS passes |
-| Route in the zone graph | O(V_z + E_z) | O(V_z + E_z) | Topological order processing |
+| DSU find and union | `O(alpha(n))` amortized per operation | `O(n)` | Path compression and union by size; initial construction takes `O(n)` |
+| Kruskal | `O(m log m + m alpha(n))` | `O(n + m)` | Sorts the walls and uses DSU |
+| Prim | `O(m log m)` | `O(n + m)` | Lazy priority queue can hold up to `O(m)` edges |
+| DFS | `O(n + m)` | `O(n + m)` | Builds open-neighbour lists and uses an explicit stack; for this maze `m = O(n)` |
+| Kosaraju | `O(n + m)` | `O(n + m)` | Two iterative DFS passes, including forward and reversed slide lists |
+| Route in the zone graph | `O(m + z + e)` | `O(z + e)` | Build edges from slides, then one topological pass; `e <= m` |
 
 ## Before you submit
 
-- data/walls.txt, data/slides.txt and output/maze.png are in the repository.
-- `java tools/Check.java` shows all examples right.
-- This README is filled in, the program output and the section AI use included.
-- The work is pushed to main (at least one commit per mission) and the repository is public.
-- The link is attached in Moodle.
+- [x] `data/walls.txt`, `data/slides.txt` and `output/maze.png` are in the project.
+- [x] `java tools/Check.java` reports that all examples and DSU checks pass.
+- [x] This README contains the program output and the AI use section.
+- [ ] Push the changes to `main` and check the required history: the uploaded archive had only three commits, while the task asks for at least one meaningful commit per mission (at least seven).
+- [ ] Verify that the repository is public and attach its link in Moodle.
